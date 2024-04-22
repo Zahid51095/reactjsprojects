@@ -11,6 +11,7 @@ export default function ImageSlider({ url, limit = 5, page = 1 }) {
   async function fetchImages(getUrl) {
     try {
       setLoading(true);
+
       const response = await fetch(`${getUrl}?page=${page}&limit=${limit}`);
       const data = await response.json();
 
@@ -24,6 +25,14 @@ export default function ImageSlider({ url, limit = 5, page = 1 }) {
     }
   }
 
+  function handlePrevious() {
+    setCurrentSlide(currentSlide === 0 ? images.length - 1 : currentSlide - 1);
+  }
+
+  function handleNext() {
+    setCurrentSlide(currentSlide === images.length - 1 ? 0 : currentSlide + 1);
+  }
+
   useEffect(() => {
     if (url !== "") fetchImages(url);
   }, [url]);
@@ -31,16 +40,19 @@ export default function ImageSlider({ url, limit = 5, page = 1 }) {
   console.log(images);
 
   if (loading) {
-    return <div>Loading data ! Please Wait</div>;
+    return <div>Loading data ! Please wait</div>;
   }
 
   if (errorMsg !== null) {
-    return <div>Error Occured !</div>;
+    return <div>Error occured ! {errorMsg}</div>;
   }
 
   return (
     <div className="container">
-      <BsArrowLeftCircleFill className="arrow arrow-left"></BsArrowLeftCircleFill>
+      <BsArrowLeftCircleFill
+        onClick={handlePrevious}
+        className="arrow arrow-left"
+      />
       {images && images.length
         ? images.map((imageItem, index) => (
             <img
@@ -55,7 +67,10 @@ export default function ImageSlider({ url, limit = 5, page = 1 }) {
             />
           ))
         : null}
-      <BsArrowRightCircleFill className="arrow arrow-right" />
+      <BsArrowRightCircleFill
+        onClick={handleNext}
+        className="arrow arrow-right"
+      />
       <span className="circle-indicators">
         {images && images.length
           ? images.map((_, index) => (
